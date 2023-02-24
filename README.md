@@ -1,0 +1,70 @@
+## Implementation of VRL4CCD in Pytorch
+---
+
+## Table of contents
+1. [Notes Attention](#Attention)
+2. [Required environment Environment](#Environment)
+3. [File Download Download](#Download)
+4. [Prediction step How2predict](#How2predict)
+5. [Training steps How2train](#How2train)
+6. [Reference Material Reference](#Reference)
+
+## Attention
+**Datasets and training your own datasets can be in two different formats**. Need to pay attention to the placement of the format！  
+
+The warehouse implements the Siamese network, which is often used to detect the similarity of two input code images. The backbone feature extraction network (backbone) used in this warehouse is VGG16.  
+
+## Environment
+torch==1.2.0
+
+## Download
+Need to download vgg16-397923af.pth pre-training weights    
+Link: https://pan.baidu.com/s/14SFoKX6xTDPx2XG9rcUTDQ Extraction code: 44en       
+
+## How2predict
+### a、Use pretrained weights
+1. After downloading the library, unzip it, put it in model_data, run predict.py, and enter    
+```python
+img/xxx.png
+```
+```python
+img/xxxx.png
+```  
+### b、Use your own trained weights
+1. Follow training steps. 
+2. In the siamese.py file, modify the model_path in the following part to correspond to the trained file; **model_path corresponds to the weight file** under the logs folder.    
+```python
+_defaults = {
+    "model_path": 'model_data/vgg.pth',
+    "input_shape" : (105, 105, 3),
+}
+```
+3. Run predict.py, enter  
+```python
+img/xxx.png
+```
+```python
+img/xxxx.png
+```
+
+## How2train  
+### Train your own model for clone detection comparison
+If you want to train your own data set, you can arrange the data set in the following format.    
+```python
+- image_background
+	- character01
+		- 0709_01.png
+		- 0709_02.png
+		- ……
+	- character02
+	- character03
+	- ……
+```
+    
+The training steps are:
+1. Place the dataset according to the above format, and put it in the dataset folder under the root directory.
+2. Then set the train_own_data in train.py to True.
+3. Run train.py to start training. 
+
+### Reference
+https://github.com/tensorfreitas/Siamese-Networks-for-One-Shot-Learning

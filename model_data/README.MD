@@ -1,0 +1,1 @@
+This part is used to store the pre-training weights of vgg16.
