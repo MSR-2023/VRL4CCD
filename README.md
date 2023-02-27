@@ -16,29 +16,32 @@ pip install -r requirements.txt
 Need to download vgg16-397923af.pth pre-training weights    
 Link: https://pan.baidu.com/s/14SFoKX6xTDPx2XG9rcUTDQ Extraction code: 44en       
 
+## Visualization
+1. Download clone fragments from https://github.com/clonebench/BigCloneBench
+2. Modify the file path in **codeVis.py**.
+1. Run **codeVis.py** to generate code images.
+
 ## How2predict
 ### Use your own trained weights
 1. Follow training steps. 
-2. Modify the **model_path in the **siamese.py file to correspond to the trained file. The trained file is in the **logs folder.
+2. Modify the **model_path** in the **siamese.py** file to correspond to the trained file. The trained file is in the **logs** folder.
   
 ```python
 _defaults = {
     "model_path": 'model_data/vgg.pth',
 }
 ```
+
 3. Run predict.py, enter  
 ```python
-img/xxx.png
-```
-```python
-img/xxxx.png
+your_img/xxx.png
 ```
 
 ## How2train  
-### Train your own model for clone detection comparison
-If you want to train your own data set, you can arrange the data set in the following format.    
+### Train your own model for clone detection.
+If you want to train your own model, you can arrange the data set in the following format. For example:
 ```python
-- image_background
+- images_background
 	- character01
 		- 0709_01.png
 		- 0709_02.png
@@ -49,9 +52,9 @@ If you want to train your own data set, you can arrange the data set in the foll
 ```
     
 The training steps are:
-1. Place the dataset according to the above format, and put it in the dataset folder under the root directory.
-2. Then set the train_own_data in train.py to True.
-3. Run train.py to start training. 
+1. Place the dataset according to the above format, and put it in the dataset folder.
+2. Then set the **train_own_data** in **train.py** to True.
+3. Run **train.py** to start training. 
 
 ### Reference
-https://github.com/tensorfreitas/Siamese-Networks-for-One-Shot-Learning
+You can see more descriptions of **Siamese Neural Networks** in the: https://github.com/tensorfreitas/Siamese-Networks-for-One-Shot-Learning
