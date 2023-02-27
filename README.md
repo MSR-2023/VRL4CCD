@@ -17,9 +17,10 @@ Need to download vgg16-397923af.pth pre-training weights
 Link: https://pan.baidu.com/s/14SFoKX6xTDPx2XG9rcUTDQ Extraction code: 44en       
 
 ## Visualization
-1. Download clone fragments from https://github.com/clonebench/BigCloneBench
-2. Modify the file path in **codeVis.py**.
-1. Run **codeVis.py** to generate code images.
+1. Download clone fragments from https://github.com/clonebench/BigCloneBench to **your_txt_path**. Each code fragment corresponds to a txt file.
+2. Cluster files by clone relationship.
+3. Modify the **your_txt_path** in **codeVis.py**.
+4. Run **codeVis.py** to generate code images.
 
 ## How2predict
 ### Use your own trained weights
@@ -29,6 +30,7 @@ Link: https://pan.baidu.com/s/14SFoKX6xTDPx2XG9rcUTDQ Extraction code: 44en
 ```python
 _defaults = {
     "model_path": 'model_data/vgg.pth',
+    ……
 }
 ```
 
