@@ -9,7 +9,7 @@ import codeVis
 
 if __name__ == "__main__":
 
-    for filepath,dirnames,filenames in os.walk(r'your_txt_path'):
+    for filepath,dirnames,filenames in os.walk(r'your_java_path'):
 
         for filename in filenames:
             project_name = filename.split('.txt')[0]
