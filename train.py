@@ -20,17 +20,17 @@ if __name__ == "__main__":
     Cuda            = True
     distributed     = False
     sync_bn         = False
-    fp16            = False
+    fp16            = False  # Whether to use mixed precision training
     dataset_path    = "datasets"
-    input_shape     = [105, 105]
-    train_own_data  = True
-    pretrained      = True
-    model_path      = "./model_data/vgg16-397923af.pth"
+    input_shape     = [105, 105]  # input image size
+    train_own_data  = True  # Default is true
+    pretrained      = True  # Whether to use the pre-trained model
+    model_path      = "./model_data/vgg16-397923af.pth"  # Pre-trained model path
     Init_Epoch          = 0
     Epoch               = 250
-    batch_size          = 1
-    Init_lr             = 1e-2
-    Min_lr              = Init_lr * 0.01
+    batch_size          = 16  # The number of pictures per input
+    Init_lr             = 1e-2  # The maximum learning rate of the model
+    Min_lr              = Init_lr * 0.01  #The minimum learning rate of the model, the default is 0.01 of the maximum learning rate
     optimizer_type      = "sgd"
     momentum            = 0.9
     weight_decay        = 5e-4
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     model = Siamese(input_shape)
     if model_path != '':
         if local_rank == 0:
-            print('Load weights {}.'.format(model_path))
+            print('Load weights {}.'.format(model_path))  # load pretrained weights
 
         model_dict      = model.state_dict()
         pretrained_dict = torch.load(model_path, map_location = device)
@@ -113,6 +113,7 @@ if __name__ == "__main__":
             cudnn.benchmark = True
             model_train = model_train.cuda()
 
+    #  Ratio of training set and validation set.
     train_ratio = 0.9
     train_lines, train_labels, val_lines, val_labels = load_dataset(dataset_path, train_own_data, train_ratio)
     num_train   = len(train_lines)
@@ -126,6 +127,11 @@ if __name__ == "__main__":
             save_period = save_period, save_dir = save_dir, num_workers = num_workers, num_train = num_train, num_val = num_val
         )
 
+        # Total training generations refers to the total number of times to traverse all data
+        # The total training step size refers to the total number of gradient descents
+        # Each training generation contains several training steps, and each training step performs a gradient descent
+        # Only the minimum training generation is recommended here, and only the unfreezing part is considered in the calculation
+
         wanted_step = 3e4 if optimizer_type == "sgd" else 1e4
         total_step  = num_train // batch_size * Epoch
         if total_step <= wanted_step:
@@ -133,6 +139,8 @@ if __name__ == "__main__":
             print("\n\033[1;33;44m[Warning] When using %s optimizer, it is recommended to set the total training of the training above %d.\033[0m"%(optimizer_type, wanted_step))
             print("\033[1;33;44m[Warning] The total training data of this operation is %d, and the batch_size is %d. A total of %d EPOCH is trained to calculate the length of the total training step to %d.\033[0m"%(num_train, batch_size, Epoch, total_step))
             print("\033[1;33;44m[Warning] Since the total training step is %d，less than the total step length of the proposal %d，it is recommended to set up the total generation to %d。\033[0m"%(total_step, wanted_step, wanted_epoch))
+
+    # Judging the current batch_size, adaptively adjust the learning rate
 
     if True:
         nbs             = 64
@@ -146,13 +154,14 @@ if __name__ == "__main__":
             'sgd'   : optim.SGD(model.parameters(), Init_lr_fit, momentum=momentum, nesterov=True, weight_decay = weight_decay)
         }[optimizer_type]
 
+        # Formula for decline of Learning Rate
         lr_scheduler_func = get_lr_scheduler(lr_decay_type, Init_lr_fit, Min_lr_fit, Epoch)
 
         epoch_step      = num_train // batch_size
         epoch_step_val  = num_val // batch_size
         
         if epoch_step == 0 or epoch_step_val == 0:
-            raise ValueError("If the dataset is too small, you cannot continue training, please expand the data set.")
+            raise ValueError("The dataset is too small, please expand the data set.")
 
         train_dataset   = SiameseDataset(input_shape, train_lines, train_labels, True)
         val_dataset     = SiameseDataset(input_shape, val_lines, val_labels, False)
@@ -172,6 +181,7 @@ if __name__ == "__main__":
         gen_val         = DataLoader(val_dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers, pin_memory=True,
                                 drop_last=True, collate_fn=dataset_collate, sampler=val_sampler)
 
+        # train
         for epoch in range(Init_Epoch, Epoch):
             if distributed:
                 train_sampler.set_epoch(epoch)
