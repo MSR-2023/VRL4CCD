@@ -12,45 +12,37 @@ from .utils_aug import center_crop, resize
 
 def load_dataset(dataset_path, train_own_data, train_ratio):
     types       = 0
-    train_path  = os.path.join(dataset_path, 'images_background')
+    train_path  = os.path.join(dataset_path, 'googlejam4_images')
     lines       = []
     labels      = []
     
     if train_own_data:
-        #-------------------------------------------------------------#
-        #   自己的数据集，遍历大循环
-        #-------------------------------------------------------------#
+
+        #   big loop through dataset
         for character in os.listdir(train_path):
-            #-------------------------------------------------------------#
-            #   对每张图片进行遍历
-            #-------------------------------------------------------------#
+
+            #   iterate over images
             character_path = os.path.join(train_path, character)
             for image in os.listdir(character_path):
                 lines.append(os.path.join(character_path, image))
                 labels.append(types)
             types += 1
     else:
-        #-------------------------------------------------------------#
-        #   Omniglot数据集，遍历大循环
-        #-------------------------------------------------------------#
+
+        #   traverse
         for alphabet in os.listdir(train_path):
             alphabet_path = os.path.join(train_path, alphabet)
-            #-------------------------------------------------------------#
-            #   Omniglot数据集，遍历小循环
-            #-------------------------------------------------------------#
+
             for character in os.listdir(alphabet_path):
                 character_path = os.path.join(alphabet_path, character)
-                #-------------------------------------------------------------#
-                #   对每张图片进行遍历
-                #-------------------------------------------------------------#
+
+                #   iterate over images
                 for image in os.listdir(character_path):
                     lines.append(os.path.join(character_path, image))
                     labels.append(types)
                 types += 1
 
-    #-------------------------------------------------------------#
-    #   将获得的所有图像进行打乱。
-    #-------------------------------------------------------------#
+    #   Scramble all images
     random.seed(1)
     shuffle_index = np.arange(len(lines), dtype=np.int32)
     shuffle(shuffle_index)
@@ -59,10 +51,8 @@ def load_dataset(dataset_path, train_own_data, train_ratio):
     labels   = np.array(labels)
     lines    = lines[shuffle_index]
     labels   = labels[shuffle_index]
-    
-    #-------------------------------------------------------------#
-    #   将训练集和验证集进行划分
-    #-------------------------------------------------------------#
+
+    #   Divide the training set and validation set
     num_train           = int(len(lines)*train_ratio)
 
     val_lines      = lines[num_train:]
@@ -72,9 +62,7 @@ def load_dataset(dataset_path, train_own_data, train_ratio):
     train_labels   = labels[:num_train]
     return train_lines, train_labels, val_lines, val_labels
 
-#---------------------------------------------------#
-#   对输入图像进行resize
-#---------------------------------------------------#
+#   resize images
 def letterbox_image(image, size, letterbox_image):
     w, h = size
     iw, ih = image.size
@@ -95,10 +83,6 @@ def letterbox_image(image, size, letterbox_image):
         new_image = center_crop(new_image, [h ,w])
     return new_image
 
-#---------------------------------------------------------#
-#   将图像转换成RGB图像，防止灰度图在预测时报错。
-#   代码仅仅支持RGB图像的预测，所有其它类型的图像都会转化成RGB
-#---------------------------------------------------------#
 def cvtColor(image):
     if len(np.shape(image)) == 3 and np.shape(image)[2] == 3:
         return image 
@@ -106,9 +90,7 @@ def cvtColor(image):
         image = image.convert('RGB')
         return image 
 
-#----------------------------------------#
-#   预处理训练图片
-#----------------------------------------#
+#   Preprocess training images
 def preprocess_input(x):
     x /= 255.0
     return x
