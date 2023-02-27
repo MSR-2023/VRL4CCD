@@ -9,8 +9,7 @@ import codeVis
 
 if __name__ == "__main__":
 
-    for filepath,dirnames,filenames in os.walk(r'D:/graphmatch_clone-master'
-                                               r'/graphmatch_clone-master/motivation'):
+    for filepath,dirnames,filenames in os.walk(r'your_txt_path'):
 
         for filename in filenames:
             project_name = filename.split('.txt')[0]
